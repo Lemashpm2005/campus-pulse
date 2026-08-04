@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
+const FileStore = require('session-file-store')(session);
 require('dotenv').config();
 
 const publicRoutes = require('./routes/public');
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-  store: new SQLiteStore({ db: 'sessions.db', dir: path.join(__dirname, 'db') }),
+  store: new FileStore({ path: path.join(__dirname, 'sessions'), logFn: function(){} }),
   secret: process.env.SESSION_SECRET || 'campus-pulse-dev-secret-change-me',
   resave: false,
   saveUninitialized: false,

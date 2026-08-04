@@ -7,3 +7,4 @@ db/campuspulse.db-shm
 public/uploads/*
 !public/uploads/.gitkeep
 db/campuspulse-backup.db
+sessions/
