@@ -1,0 +1,72 @@
+<% pageTitle = 'Home' %>
+<%- include('partials/header') %>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">📢 Registrar: exam timetable now live on the student portal</span>
+    <span class="ticker-item">🏆 Campus Tech Hackathon results announced this week</span>
+    <span class="ticker-item">📅 Add/drop deadline is this Friday</span>
+    <span class="ticker-item" aria-hidden="true">📢 Registrar: exam timetable now live on the student portal</span>
+    <span class="ticker-item" aria-hidden="true">🏆 Campus Tech Hackathon results announced this week</span>
+    <span class="ticker-item" aria-hidden="true">📅 Add/drop deadline is this Friday</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="filter-bar">
+    <a href="/" class="filter-chip <%= !activeCategory ? 'active' : '' %>">All</a>
+    <% categories.forEach(cat => { %>
+      <a href="/?category=<%= cat.slug %>" class="filter-chip <%= activeCategory === cat.slug ? 'active' : '' %>"><%= cat.name %></a>
+    <% }) %>
+  </div>
+
+  <% if (hero) { %>
+    <a href="/news/<%= hero.slug %>" class="hero">
+      <img class="hero-image" src="<%= hero.cover_image_url || '/img/placeholder.svg' %>" alt="<%= hero.title %>">
+      <div>
+        <% if (hero.category_name) { %><span class="hero-category"><%= hero.category_name %></span><% } %>
+        <h1 class="hero-title"><%= hero.title %></h1>
+        <p class="card-snippet"><%= hero.snippet %></p>
+        <div class="hero-meta">
+          <img class="avatar" src="<%= hero.author_avatar || '/img/placeholder-avatar.svg' %>" alt="">
+          <span><%= hero.author_name %></span>
+          <span>&middot;</span>
+          <span><%= new Date(hero.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></span>
+        </div>
+      </div>
+    </a>
+  <% } %>
+
+  <h2 class="section-title">Latest News</h2>
+
+  <% if (articles.length === 0 && !hero) { %>
+    <div class="empty-state">
+      <p>No published stories yet. Once a journalist submits a story and an editor approves it, it will show up here.</p>
+    </div>
+  <% } else if (articles.length === 0) { %>
+    <div class="empty-state"><p>No more stories in this category yet.</p></div>
+  <% } else { %>
+    <div class="news-grid">
+      <% articles.forEach(article => { %>
+        <a href="/news/<%= article.slug %>" class="card">
+          <div class="card-image-wrap">
+            <img class="card-image" src="<%= article.cover_image_url || '/img/placeholder.svg' %>" alt="<%= article.title %>">
+            <% if (article.category_name) { %><span class="card-badge"><%= article.category_name %></span><% } %>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title"><%= article.title %></h3>
+            <p class="card-snippet"><%= article.snippet %></p>
+            <div class="card-meta">
+              <img class="avatar" style="width:22px;height:22px" src="<%= article.author_avatar || '/img/placeholder-avatar.svg' %>" alt="">
+              <span><%= article.author_name %></span>
+              <span>&middot;</span>
+              <span><%= new Date(article.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></span>
+            </div>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

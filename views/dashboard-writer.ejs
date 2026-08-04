@@ -1,0 +1,50 @@
+<% pageTitle = 'My Articles' %>
+<%- include('partials/header') %>
+
+<div class="container">
+  <div class="dash-header">
+    <h1>My Articles</h1>
+    <a href="/dashboard/writer/new" class="btn btn-primary">+ Create New Story</a>
+  </div>
+
+  <% if (articles.length === 0) { %>
+    <div class="empty-state">
+      <p>You haven't written any stories yet. Click "Create New Story" to get started.</p>
+    </div>
+  <% } else { %>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Last Updated</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% articles.forEach(a => { %>
+          <tr>
+            <td><%= a.title %></td>
+            <td><%= a.category_name || '—' %></td>
+            <td>
+              <% if (a.status === 'DRAFT') { %><span class="badge badge-draft">Draft</span>
+              <% } else if (a.status === 'PENDING_REVIEW') { %><span class="badge badge-pending">Pending Review</span>
+              <% } else { %><span class="badge badge-published">Published</span><% } %>
+            </td>
+            <td><%= new Date(a.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></td>
+            <td class="action-links">
+              <% if (a.status === 'PUBLISHED') { %>
+                <a href="/news/<%= a.slug %>" class="btn btn-ghost btn-sm">View</a>
+              <% } else { %>
+                <a href="/dashboard/writer/edit/<%= a.id %>" class="btn btn-ghost btn-sm">Edit</a>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

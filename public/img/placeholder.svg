@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500">
+  <rect width="900" height="500" fill="#F9FAFB"/>
+  <rect x="0" y="0" width="900" height="500" fill="none" stroke="#E5E7EB" stroke-width="2"/>
+  <text x="450" y="260" font-family="Arial, sans-serif" font-size="26" fill="#9CA3AF" text-anchor="middle">No cover image yet</text>
+</svg>

@@ -1,0 +1,62 @@
+<% pageTitle = 'My Profile' %>
+<%- include('partials/header') %>
+
+<div class="story-form-wrap">
+  <h1 class="dash-header" style="padding:0 0 20px">My Profile</h1>
+
+  <% if (success) { %>
+    <div class="feedback-note"><%= success %></div>
+  <% } %>
+  <% if (error) { %>
+    <div class="error-msg"><%= error %></div>
+  <% } %>
+
+  <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+    <img src="<%= me.avatar_url || '/img/placeholder-avatar.svg' %>" alt="<%= me.name %>"
+         style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:1px solid var(--color-border);">
+    <div>
+      <div style="font-weight:700; font-size:1.1rem;"><%= me.name %></div>
+      <div style="color:var(--color-text-muted); font-size:0.85rem;"><%= me.email %> &middot; <%= me.role %></div>
+    </div>
+  </div>
+
+  <form action="/profile" method="POST">
+    <div class="form-group">
+      <label for="title">Role / title (shown on the Team page)</label>
+      <input type="text" id="title" name="title" value="<%= me.title || '' %>" placeholder="e.g. Journalist & Student Reporter">
+    </div>
+
+    <div class="form-group">
+      <label for="bio">Bio</label>
+      <textarea id="bio" name="bio" rows="5" placeholder="A short bio for the Team page..."><%= me.bio || '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="avatar_file_raw">Update profile picture</label>
+      <input type="file" id="avatar_file_raw" accept=".jpg,.jpeg,.png,.gif,.webp">
+      <p class="file-hint">Pick a photo, then drag to reposition and use the slider to zoom before saving.</p>
+
+      <div id="avatar-crop-wrap" class="avatar-crop-wrap">
+        <p class="avatar-crop-hint">Drag the photo to reposition &middot; use the slider to zoom</p>
+        <canvas id="avatar-crop-canvas" width="260" height="260"></canvas>
+        <div class="avatar-zoom-row">
+          <span style="font-size:0.8rem;">🔍</span>
+          <input type="range" id="avatar-zoom">
+        </div>
+        <div style="text-align:center;">
+          <button type="button" id="avatar-use-btn" class="btn btn-navy btn-sm">Use This Photo</button>
+        </div>
+      </div>
+
+      <img id="avatar-result-preview" class="image-preview" style="display:none; max-width:160px; aspect-ratio:1; border-radius:50%; margin-top:14px;">
+      <input type="hidden" id="avatar_data" name="avatar_data">
+    </div>
+
+    <div class="action-row">
+      <button type="submit" class="btn btn-primary">Save Profile</button>
+    </div>
+  </form>
+</div>
+
+<script src="/js/avatar-crop.js"></script>
+<%- include('partials/footer') %>

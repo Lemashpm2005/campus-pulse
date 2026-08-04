@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof pageTitle !== 'undefined' ? pageTitle + ' — Campus Pulse' : 'Campus Pulse' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="site-watermark" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <span class="logo-badge"><img src="/img/logo.png" alt="Campus Pulse logo" class="logo-img"></span>
+        <span class="logo-text-wrap">
+          <span class="logo-text">Campus Pulse</span>
+          <span class="logo-slogan">Keeping you in the loop</span>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="/">Home</a>
+        <a href="/?category=academics">Academics</a>
+        <a href="/?category=campus-sports">Sports</a>
+        <a href="/?category=technology">Technology</a>
+        <a href="/?category=events">Events</a>
+        <a href="/team">Team</a>
+      </nav>
+      <div class="header-actions">
+        <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+          <span class="user-chip"><%= currentUser.name %> (<%= currentUser.role %>)</span>
+          <% if (currentUser.role === 'JOURNALIST') { %>
+            <a href="/dashboard/writer" class="btn btn-ghost">My Dashboard</a>
+          <% } else { %>
+            <a href="/dashboard/editor" class="btn btn-ghost">My Dashboard</a>
+          <% } %>
+          <a href="/profile" class="btn btn-ghost">My Profile</a>
+          <form action="/logout" method="POST" style="display:inline">
+            <button class="btn btn-outline" type="submit">Log out</button>
+          </form>
+        <% } else { %>
+          <a href="/login" class="btn btn-primary">Team Login</a>
+        <% } %>
+      </div>
+    </div>
+  </header>
+  <main class="page-enter">

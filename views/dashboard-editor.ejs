@@ -1,0 +1,245 @@
+<% pageTitle = 'Editor Dashboard' %>
+<%- include('partials/header') %>
+
+<div class="container">
+  <div class="dash-header">
+    <h1>Editorial Queue</h1>
+    <a href="/dashboard/editor/new" class="btn btn-primary">+ Write New Story</a>
+  </div>
+
+  <% if (myArticles && myArticles.length > 0) { %>
+    <h1 class="dash-header" style="padding-top:0; padding-bottom:10px;"><span style="font-size:1.1rem; font-weight:700;">My Articles</span></h1>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Last Updated</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% myArticles.forEach(a => { %>
+          <tr>
+            <td><%= a.title %></td>
+            <td><%= a.category_name || '—' %></td>
+            <td>
+              <% if (a.status === 'DRAFT') { %><span class="badge badge-draft">Draft</span>
+              <% } else if (a.status === 'PENDING_REVIEW') { %><span class="badge badge-pending">Pending Review</span>
+              <% } else { %><span class="badge badge-published">Published</span><% } %>
+            </td>
+            <td><%= new Date(a.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></td>
+            <td class="action-links">
+              <% if (a.status === 'PUBLISHED') { %>
+                <a href="/news/<%= a.slug %>" class="btn btn-ghost btn-sm">View</a>
+              <% } else { %>
+                <a href="/dashboard/editor/review/<%= a.id %>" class="btn btn-ghost btn-sm">Edit</a>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <% if (pending.length === 0) { %>
+    <div class="empty-state">
+      <p>No stories waiting for review right now.</p>
+    </div>
+  <% } else { %>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Category</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% pending.forEach(a => { %>
+          <tr>
+            <td><%= a.title %></td>
+            <td><%= a.author_name %></td>
+            <td><%= a.category_name || '—' %></td>
+            <td><%= new Date(a.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></td>
+            <td class="action-links">
+              <a href="/dashboard/editor/review/<%= a.id %>" class="btn btn-ghost btn-sm">Review & Edit</a>
+              <form action="/dashboard/editor/publish/<%= a.id %>" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-primary btn-sm">Approve & Publish</button>
+              </form>
+              <form action="/dashboard/editor/reject/<%= a.id %>" method="POST" style="display:inline"
+                    onsubmit="return addFeedback(this)">
+                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <h1 class="dash-header" style="padding-top:8px">Pending Journalist Registrations</h1>
+  <% if (!isChief) { %>
+    <p style="color:var(--color-text-muted); font-size:0.85rem; margin-top:-10px; margin-bottom:16px;">You can view registration requests, but only the Chief Editor can approve or reject them.</p>
+  <% } %>
+
+  <% if (pendingUsers.length === 0) { %>
+    <div class="empty-state">
+      <p>No new account requests right now.</p>
+    </div>
+  <% } else { %>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Requested Role</th>
+          <th><%= isChief ? 'Actions' : 'Status' %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% pendingUsers.forEach(u => { %>
+          <tr>
+            <td><%= u.name %></td>
+            <td><%= u.email %></td>
+            <td><%= u.role %></td>
+            <td class="action-links">
+              <% if (isChief) { %>
+                <form action="/dashboard/editor/users/approve/<%= u.id %>" method="POST" style="display:inline">
+                  <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                </form>
+                <form action="/dashboard/editor/users/reject/<%= u.id %>" method="POST" style="display:inline"
+                      onsubmit="return confirm('Reject and permanently remove this account request?')">
+                  <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                </form>
+              <% } else { %>
+                <span class="badge badge-pending">Awaiting Chief Editor</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <h1 class="dash-header" style="padding-top:8px">Team Members</h1>
+  <% if (!isChief) { %>
+    <p style="color:var(--color-text-muted); font-size:0.85rem; margin-top:-10px; margin-bottom:16px;">You can view team status, but only the Chief Editor can deactivate or reactivate accounts.</p>
+  <% } %>
+
+  <% if (journalists.length === 0) { %>
+    <div class="empty-state">
+      <p>No other team accounts yet.</p>
+    </div>
+  <% } else { %>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Status</th>
+          <% if (isChief) { %><th>Actions</th><% } %>
+        </tr>
+      </thead>
+      <tbody>
+        <% journalists.forEach(j => { %>
+          <tr>
+            <td><%= j.name %><% if (j.is_chief) { %> <span class="badge badge-published" style="margin-left:4px;">Chief</span><% } %></td>
+            <td><%= j.email %></td>
+            <td><%= j.role === 'EDITOR' ? (j.is_chief ? 'Chief Editor' : 'Co-Editor') : 'Journalist' %></td>
+            <td>
+              <% if (j.active) { %><span class="badge badge-published">Active</span>
+              <% } else { %><span class="badge badge-draft">Deactivated</span><% } %>
+            </td>
+            <% if (isChief) { %>
+              <td class="action-links">
+                <% if (j.is_chief) { %>
+                  <span style="color:var(--color-text-muted); font-size:0.8rem;">—</span>
+                <% } else if (j.active) { %>
+                  <form action="/dashboard/editor/users/deactivate/<%= j.id %>" method="POST" style="display:inline"
+                        onsubmit="return confirm('Deactivate this account? Their past published stories stay on the site, but they will no longer be able to log in.')">
+                    <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
+                  </form>
+                <% } else { %>
+                  <form action="/dashboard/editor/users/reactivate/<%= j.id %>" method="POST" style="display:inline">
+                    <button type="submit" class="btn btn-primary btn-sm">Reactivate</button>
+                  </form>
+                <% } %>
+              </td>
+            <% } %>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <h1 class="dash-header" style="padding-top:8px">Live Published Articles</h1>
+
+  <% if (published.length === 0) { %>
+    <div class="empty-state">
+      <p>Nothing published yet. Approve a story above to make it go live.</p>
+    </div>
+  <% } else { %>
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Author</th>
+          <th>Published</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% published.forEach(a => { %>
+          <tr>
+            <td><a href="/news/<%= a.slug %>"><%= a.title %></a></td>
+            <td><%= a.author_name %></td>
+            <td><%= new Date(a.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></td>
+            <td class="action-links">
+              <form action="/dashboard/editor/unpublish/<%= a.id %>" method="POST" style="display:inline">
+                <button type="submit" class="btn btn-ghost btn-sm">Unpublish</button>
+              </form>
+              <form action="/dashboard/editor/delete/<%= a.id %>" method="POST" style="display:inline"
+                    onsubmit="return confirm('Delete this article permanently?')">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <h1 class="dash-header" style="padding-top:8px">Manage Categories</h1>
+  <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:40px; align-items:flex-end;">
+    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <% categories.forEach(cat => { %>
+        <span class="filter-chip"><%= cat.name %></span>
+      <% }) %>
+    </div>
+  </div>
+  <form action="/dashboard/editor/categories" method="POST" style="display:flex; gap:10px; max-width:400px; margin-bottom:60px;">
+    <input type="text" name="name" placeholder="e.g. Graduation" required style="flex:1; padding:10px 12px; border:1px solid var(--color-border); border-radius:8px;">
+    <button type="submit" class="btn btn-navy">Add Category</button>
+  </form>
+</div>
+
+<script>
+  function addFeedback(form) {
+    const note = prompt('Optional: add a note for the journalist explaining why this was returned.');
+    if (note !== null) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'feedback_notes';
+      input.value = note;
+      form.appendChild(input);
+    }
+    return true;
+  }
+</script>
+
+<%- include('partials/footer') %>

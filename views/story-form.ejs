@@ -1,0 +1,62 @@
+<% pageTitle = article ? 'Edit Story' : 'New Story' %>
+<%- include('partials/header') %>
+
+<div class="story-form-wrap">
+  <h1 class="dash-header" style="padding:0 0 20px"><%= article ? 'Edit Story' : 'Create New Story' %></h1>
+
+  <% if (article && article.feedback_notes) { %>
+    <div class="feedback-note"><strong>Editor feedback:</strong> <%= article.feedback_notes %></div>
+  <% } %>
+
+  <form action="<%= formAction %>" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title">Headline</label>
+      <input type="text" id="title" name="title" required value="<%= article ? article.title : '' %>">
+    </div>
+
+    <div class="form-group">
+      <label for="category_id">Category</label>
+      <select id="category_id" name="category_id">
+        <option value="">Uncategorized</option>
+        <% categories.forEach(cat => { %>
+          <option value="<%= cat.id %>" <%= article && article.category_id === cat.id ? 'selected' : '' %>><%= cat.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="cover_image_url">Cover photo — paste an image URL</label>
+      <input type="url" id="cover_image_url" name="cover_image_url" placeholder="https://example.com/photo.jpg"
+             value="<%= article && article.cover_image_url && !article.cover_image_url.startsWith('/uploads/') ? article.cover_image_url : '' %>">
+    </div>
+
+    <div class="form-group">
+      <label for="cover_image_file">...or upload a photo from your computer</label>
+      <input type="file" id="cover_image_file" name="cover_image_file" accept=".jpg,.jpeg,.png,.gif,.webp">
+      <p class="file-hint">Uploading a file here will override the URL above. Max size 5MB.</p>
+      <img id="image-preview" class="image-preview"
+           src="<%= article && article.cover_image_url ? article.cover_image_url : '' %>"
+           style="<%= article && article.cover_image_url ? 'display:block' : '' %>">
+    </div>
+
+    <div class="form-group">
+      <label for="content">Story content</label>
+      <textarea id="content" name="content" rows="12" required placeholder="Write the full story here. Leave a blank line between paragraphs."><%= article ? article.content : '' %></textarea>
+    </div>
+
+    <div class="action-row">
+      <% if (typeof isEditorCreate !== 'undefined' && isEditorCreate) { %>
+        <button type="submit" name="action" value="draft" class="btn btn-ghost">Save as Draft</button>
+        <button type="submit" name="action" value="publish" class="btn btn-primary">Publish Now</button>
+      <% } else if (typeof isEditorReview !== 'undefined' && isEditorReview) { %>
+        <button type="submit" class="btn btn-navy">Save Changes</button>
+      <% } else { %>
+        <button type="submit" name="action" value="draft" class="btn btn-ghost">Save as Draft</button>
+        <button type="submit" name="action" value="submit" class="btn btn-primary">Submit for Review</button>
+      <% } %>
+      <a href="<%= (typeof isEditorReview !== 'undefined' && isEditorReview) || (typeof isEditorCreate !== 'undefined' && isEditorCreate) ? '/dashboard/editor' : '/dashboard/writer' %>" class="btn btn-outline">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('partials/footer') %>

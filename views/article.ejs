@@ -1,0 +1,51 @@
+<% pageTitle = article.title %>
+<%- include('partials/header') %>
+
+<div class="article-page">
+  <% if (article.category_name) { %><span class="hero-category"><%= article.category_name %></span><% } %>
+  <h1 class="article-title"><%= article.title %></h1>
+
+  <div class="article-meta">
+    <img class="avatar" src="<%= article.author_avatar || '/img/placeholder-avatar.svg' %>" alt="">
+    <span><%= article.author_name %></span>
+    <span class="role-badge"><%= article.author_title && article.author_title.includes('Editor') ? 'Editor' : 'Journalist' %></span>
+    <span>&middot;</span>
+    <span><%= new Date(article.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) %></span>
+  </div>
+
+  <img class="article-header-image" src="<%= article.cover_image_url || '/img/placeholder.svg' %>" alt="<%= article.title %>">
+
+  <div class="article-body">
+    <% article.content.split('\n\n').forEach(paragraph => { %>
+      <p><%= paragraph %></p>
+    <% }) %>
+  </div>
+</div>
+
+<% if (related && related.length > 0) { %>
+<div class="container">
+  <h2 class="section-title related-title">
+    <% if (article.category_name) { %>More in <%= article.category_name %><% } else { %>You might also like<% } %>
+  </h2>
+  <div class="news-grid related-grid">
+    <% related.forEach(r => { %>
+      <a href="/news/<%= r.slug %>" class="card">
+        <div class="card-image-wrap">
+          <img class="card-image" src="<%= r.cover_image_url || '/img/placeholder.svg' %>" alt="<%= r.title %>">
+        </div>
+        <div class="card-body">
+          <h3 class="card-title"><%= r.title %></h3>
+          <div class="card-meta">
+            <img class="avatar" style="width:22px;height:22px" src="<%= r.author_avatar || '/img/placeholder-avatar.svg' %>" alt="">
+            <span><%= r.author_name %></span>
+            <span>&middot;</span>
+            <span><%= new Date(r.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %></span>
+          </div>
+        </div>
+      </a>
+    <% }) %>
+  </div>
+</div>
+<% } %>
+
+<%- include('partials/footer') %>

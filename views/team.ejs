@@ -1,0 +1,23 @@
+<% pageTitle = 'Meet the Team' %>
+<%- include('partials/header') %>
+
+<div class="container">
+  <div class="team-hero">
+    <h1>Meet the Campus Pulse Team</h1>
+    <p>The students behind the stories.</p>
+  </div>
+
+  <div class="team-grid">
+    <% team.forEach(member => { %>
+      <div class="team-card">
+        <img class="team-avatar" src="<%= member.avatar_url || '/img/placeholder-avatar.svg' %>" alt="<%= member.name %>">
+        <h3><%= member.name %></h3>
+        <p class="team-role"><%= member.title %></p>
+        <p class="team-email"><%= member.email %></p>
+        <p class="team-bio"><%= member.bio %></p>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

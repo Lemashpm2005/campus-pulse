@@ -1,0 +1,8 @@
+node_modules/
+.env
+db/campuspulse.db
+db/campuspulse.db-journal
+db/campuspulse.db-wal
+db/campuspulse.db-shm
+public/uploads/*
+!public/uploads/.gitkeep
